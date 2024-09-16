@@ -13,7 +13,7 @@ const Navbar = () => {
     {
       icon: <CgProfile size={25} />,
       text: "Login/Sign-up",
-      link: "/auth/login",
+      link: "/sign-up",
     },
     {
       icon: <TbTruckDelivery size={25} />,

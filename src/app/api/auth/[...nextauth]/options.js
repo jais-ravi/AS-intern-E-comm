@@ -4,11 +4,11 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/user-model";
 
-export const authOption = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
-      id: "credentails",
-      name: "Credentails",
+      id: "credentials", // Fixed typo: changed 'credentails' to 'credentials'
+      name: "Credentials",
       credentials: {
         email: {
           label: "Email",
@@ -17,30 +17,32 @@ export const authOption = {
         },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentails) {
+      async authorize(credentials) {
         await dbConnect();
         try {
           const user = await UserModel.findOne({
-            email: credentails.identifier,
+            email: credentials.email, // Fixed: `credentials.email` instead of `credentials.identifier`
           });
           if (!user) {
-            throw new Error("No User found with this email");
+            throw new Error("No user found with this email");
           }
 
           if (!user.isVerified) {
-            throw new Error("Please verify you account");
+            throw new Error("Please verify your account");
           }
+
           const isPasswordCorrect = await bcrypt.compare(
-            credentails.password,
+            credentials.password,
             user.password
           );
+
           if (isPasswordCorrect) {
             return user;
           } else {
             throw new Error("Email or Password incorrect");
           }
         } catch (err) {
-          throw new Error(err);
+          throw new Error(err.message); // Improved error handling
         }
       },
     }),
@@ -51,6 +53,7 @@ export const authOption = {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.email = user.email;
+        token.username = user.username; // Make sure `username` is defined in the user model
       }
       return token;
     },
@@ -58,7 +61,8 @@ export const authOption = {
       if (token) {
         session.user._id = token._id;
         session.user.isVerified = token.isVerified;
-        session.user.username = token.username; //TODO: may causes error
+        session.user.email = token.email;
+        session.user.username = token.username || ""; // TODO: Ensures `username` exists, even if it's not provided
       }
       return session;
     },

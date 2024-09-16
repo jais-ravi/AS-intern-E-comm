@@ -3,7 +3,6 @@ import UserModel from "@/model/user-model";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmails";
 
-
 export async function POST(request) {
   await dbConnect();
   try {
@@ -27,7 +26,7 @@ export async function POST(request) {
         existingUserVerifiedByEmail.password = hasedPassword;
         existingUserVerifiedByEmail.verifyCode = verifyCode;
         // sessionn expire krwnwe wla nahi bnye h
-        await existingUserVerifiedByEmail.save()
+        await existingUserVerifiedByEmail.save();
       }
       return Response.json(
         {
@@ -35,8 +34,7 @@ export async function POST(request) {
           message: "User already exist with this email",
         },
         { status: 400 }
-      )
-      
+      );
     } else {
       const hasedPassword = await bcrypt.hash(password, 10);
 
