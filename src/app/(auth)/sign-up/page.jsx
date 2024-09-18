@@ -1,18 +1,16 @@
 "use client";
-
+import Image from "next/image";
 import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,11 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { signUpSchema } from "@/schemas/signupSchema";
+import { Card } from "@/components/ui/card";
 
-const page = () => {
-//   const [username, setUsername] = useState("");
-//   const [usernameMessage, setUsernameMessage] = useState("");
-//   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+export default function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -39,6 +35,7 @@ const page = () => {
       password: "",
     },
   });
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
@@ -47,100 +44,126 @@ const page = () => {
         title: "Success",
         description: response.data.message,
       });
-    //   router.replace(`/verify/${username}`);
+      router.replace(`/verify/${data.username}`);
       setIsSubmitting(false);
     } catch (error) {
       console.error("Error in signup of user", error);
-      // const axiosError = error ;
-      if (error.isAxiosError) {
-        const axiosError = AxiosError; //TODO:  may be used another approch
-        let errorMessage = axiosError.response?.data.message;
+
+      if (axios.isAxiosError(error)) {
+        let errorMessage =
+          error.response?.data.message || "Something went wrong!";
         toast({
-          title: "Signu failed",
+          title: "Signup failed",
           description: errorMessage,
           variant: "destructive",
         });
-        setIsSubmitting(false);
+      } else {
+        toast({
+          title: "Signup failed",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
       }
+
+      setIsSubmitting(false);
     }
   };
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Sign in Your account
-          </h1>
-          <p className="mb-4">Sign in to continue with your account</p>
+    <div className="h-[100vh] w-full flex justify-center items-center">
+      <Card className=" w-[80%] drop-shadow-2xl">
+        <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+          <div className="hidden bg-muted lg:block">
+            <Image
+              src="/placeholder.svg"
+              alt="Image"
+              width="1920"
+              height="1080"
+              className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+            />
+          </div>
+          <div className="flex items-center justify-center py-12">
+            <div className="mx-auto grid w-[350px] gap-6">
+              <div className="grid gap-2 text-center">
+                <h1 className="text-3xl font-bold">Signup</h1>
+                <p className="text-balance text-muted-foreground">
+                  Enter your details below to create a new account
+                </p>
+              </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <FormField
+                    name="username"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Username" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="password"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    className="w-full"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait
+                      </>
+                    ) : (
+                      "Signup"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+              <div className="mt-4 text-center text-sm">
+                Already have an account?{" "}
+                <Link href="/sign-in" className="underline">
+                  Login
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-              name="username"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="email"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="password"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
-                </>
-              ) : (
-                "Signup"
-              )}
-              
-            </Button>
-          </form>
-        </Form>
-        <div className="text-center mt-4">
-          <p>
-            Not a member yet?{" "}
-            <Button variant="link"  >
-              <Link href="/sign-in">signup</Link>
-            </Button>
-            {/* <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
-              Sign up
-            </Link> */}
-          </p>
-        </div>
-      </div>
+      </Card>
     </div>
   );
-};
-
-export default page;
+}

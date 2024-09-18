@@ -1,5 +1,6 @@
 "use client";
-
+import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,15 +19,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-
 import { signInSchema } from "@/schemas/loginSchema";
 import { signIn } from "next-auth/react";
 
-const SignInPage = () => {
+export default function SignInPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-
   // ZOD form validation schema
   const form = useForm({
     resolver: zodResolver(signInSchema),
@@ -71,67 +70,84 @@ const SignInPage = () => {
       router.replace("/");
     }
   };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Sign in to Your Account
-          </h1>
-          <p className="mb-4">Sign in to continue with your account</p>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              name="email"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <div className="h-[100vh] w-full flex justify-center items-center">
+      <Card className=" w-[90%] drop-shadow-2xl">
+        <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+          <div className="flex items-center justify-center py-12 px-3">
+            <div className="mx-auto grid w-[350px] gap-6">
+              <div className="grid gap-2 text-center">
+                <h1 className="text-3xl font-bold">Login</h1>
+                <p className="text-balance text-muted-foreground">
+                  Enter your email below to login to your account
+                </p>
+              </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="password"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    className="w-full"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait...
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/sign-up" className="underline">
+                  Sign up
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="hidden bg-muted lg:block">
+            <Image
+              src="/placeholder.svg"
+              alt="Image"
+              width="1920"
+              height="1080"
+              className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
-            <FormField
-              name="password"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-        </Form>
-        <div className="text-center mt-4">
-          <p>
-            Not a member yet?{" "}
-            <Button variant="link">
-              <Link href="/sign-up">Sign Up</Link>
-            </Button>
-          </p>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
-};
-
-export default SignInPage;
+}
