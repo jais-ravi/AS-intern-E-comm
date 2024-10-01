@@ -1,7 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/user-model";
 import bcrypt from "bcryptjs";
-import { sendVerificationEmail } from "@/helpers/sendVerificationEmails";
+import sendVerificationEmail from "@/helpers/sendVerificationEmail";
 
 export async function POST(request) {
   await dbConnect();
@@ -17,7 +17,7 @@ export async function POST(request) {
         return Response.json(
           {
             success: false,
-            message: "User already exist with this] email", //TODO: check krna h upr niche krke
+            message: "User already exist with this email", //TODO: check krna h upr niche krke
           },
           { status: 400 }
         );
