@@ -7,7 +7,7 @@ export async function POST() {
   try {
     const { username, code } = await request.json();
     const decodedUsername = decodeURIComponent(username);
-    const user = await UserModel.findOne({ username: decodedUsername });
+    const user = await UserModel.findOne({ username: decodedUsername }); //TODO: change it top email and mobile no
 
     if (!user) {
       return Response.json(
@@ -28,7 +28,7 @@ export async function POST() {
       return Response.json(
         {
           success: true,
-          message: "Account verified successfully",
+          message: "Account verified successfully",//TODO: check verification mail
         },
         { status: 200 }
       );
