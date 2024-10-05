@@ -21,7 +21,7 @@ import { Loader2 } from "lucide-react";
 import { signUpSchema } from "@/schemas/signupSchema";
 import { Card } from "@/components/ui/card";
 
-export default function Page() {
+export default function Page(req) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -40,11 +40,16 @@ export default function Page() {
     setIsSubmitting(true);
     try {
       const response = await axios.post("/api/sign-up", data);
-      toast({
-        title: "Success",
-        description: response.data.message,
-      });
-      router.replace(`/verify/${data.username}`);
+
+      if (response.data.success) {
+        toast({
+          title: "Success",
+          description: response.data.message,
+        });
+        // Use the returned userId (_id) to navigate to the verify route
+        router.replace(`/verify/${response.data.userId}`);
+      }
+
       setIsSubmitting(false);
     } catch (error) {
       console.error("Error in signup of user", error);
@@ -75,7 +80,7 @@ export default function Page() {
         <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
           <div className="hidden bg-muted lg:block">
             <Image
-              src="/placeholder.svg"
+              src="/next.svg"
               alt="Image"
               width="1920"
               height="1080"

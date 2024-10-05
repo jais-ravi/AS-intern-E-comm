@@ -7,11 +7,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+// import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -19,7 +25,7 @@ import { verifySchema } from "@/schemas/verifySchema";
 
 const VerifyAccount = () => {
   const router = useRouter();
-  const params = useParams();
+  const params = useParams(); // Make sure your URL contains dynamic segments like [email] if you're using this
   const { toast } = useToast();
 
   const form = useForm({
@@ -29,25 +35,31 @@ const VerifyAccount = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(`/api/verify-code`, {
-        user_id: params._id,
+        userId: params.userId, // Ensure your params contain email from the URL if needed
         code: data.code,
       });
 
       toast({
-        title: "Sucess",
+        title: "Success",
         description: response.data.message,
       });
-      router.replace("sign-in");
+
+      // Redirect to sign-in page after successful verification
+      router.replace("/sign-in");
     } catch (error) {
-      console.error("Error in signup of user", error);
-      // const axiosError = error ;
-      if (error.isAxiosError) {
-        const axiosError = AxiosError; //TODO:  may be used another approch
+      if (axios.isAxiosError(error)) {
         toast({
           title: "Verification Failed",
           description:
-            axiosError.response?.data.message ??
+            error.response?.data.message ??
             "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        console.error("Error in verification process:", error);
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again later.",
           variant: "destructive",
         });
       }
@@ -71,7 +83,19 @@ const VerifyAccount = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Verification Code</FormLabel>
-                  <Input {...field} />
+                  <FormControl>
+                    <InputOTP maxLength={6} {...field}>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </FormControl>
+
                   <FormMessage />
                 </FormItem>
               )}

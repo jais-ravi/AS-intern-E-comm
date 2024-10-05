@@ -12,72 +12,77 @@ export async function POST(request) {
       isVerified: true,
     });
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+
     if (existingUserVerifiedByEmail) {
       if (existingUserVerifiedByEmail.isVerified) {
         return Response.json(
           {
             success: false,
-            message: "User already exist with this email", //TODO: check krna h upr niche krke
+            message: "User already exists with this email",
           },
           { status: 400 }
         );
       } else {
-        const hasedPassword = await bcrypt.hash(password, 10);
-        existingUserVerifiedByEmail.password = hasedPassword;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        existingUserVerifiedByEmail.password = hashedPassword;
         existingUserVerifiedByEmail.verifyCode = verifyCode;
-        // sessionn expire krwnwe wla nahi bnye h
         await existingUserVerifiedByEmail.save();
+        
+        // Return _id in the response when user is updated but not verified yet
+        return Response.json(
+          {
+            success: true,
+            message: "User updated successfully. Please verify your email.",
+            userId: existingUserVerifiedByEmail._id,
+          },
+          { status: 200 }
+        );
       }
-      return Response.json(
-        {
-          success: false,
-          message: "User already exist with this email",
-        },
-        { status: 400 }
-      );
     } else {
-      const hasedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = new UserModel({
         username,
         email,
-        password: hasedPassword,
+        password: hashedPassword,
         verifyCode,
       });
       await newUser.save();
-    }
 
-    const emailResponse = await sendVerificationEmail(
-      email,
-      username,
-      verifyCode
-    );
-    if (!emailResponse.success) {
+      // Send the verification email
+      const emailResponse = await sendVerificationEmail(
+        email,
+        username,
+        verifyCode
+      );
+      if (!emailResponse.success) {
+        return Response.json(
+          {
+            success: false,
+            message: emailResponse.message,
+          },
+          { status: 500 }
+        );
+      }
+
+      // Return the _id of the newly created user
       return Response.json(
         {
-          success: false,
-          message: emailResponse.message,
+          success: true,
+          message: "User registered successfully. Please verify your email.",
+          userId: newUser._id,
         },
-        { status: 500 }
+        { status: 201 }
       );
     }
-    return Response.json(
-      {
-        success: true,
-        message: "User register successfully. please verify your email",
-      },
-      { status: 201 }
-    );
   } catch (error) {
-    console.error("error registering user", error);
+    console.error("Error registering user", error);
     return Response.json(
       {
         success: false,
         message: "Error registering user",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
