@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { FcGoogle } from "react-icons/fc";
 import {
   Form,
   FormControl,
@@ -129,6 +130,24 @@ export default function SignInPage() {
                   </Button>
                 </form>
               </Form>
+              <div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => signIn("google")} variant="outline">
+                <div className="flex justify-center items-center gap-4">
+                  <FcGoogle size={25} />
+                  <p>Sign in with Google</p>
+                </div>
+              </Button>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
                 <Link href="/sign-up" className="underline">

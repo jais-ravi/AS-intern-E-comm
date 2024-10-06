@@ -1,8 +1,8 @@
-import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/user-model";
+import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions = {
   providers: [
@@ -46,25 +46,61 @@ export const authOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
+      // If user or profile exists, set the username
       if (user) {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.email = user.email;
-        token.username = user.username; // Make sure `username` is defined in the user model
+        token.username = user.username || profile?.name; // Set username from profile if user.username is undefined
       }
       return token;
     },
     async session({ session, token }) {
+      // Pass the token data to the session
       if (token) {
         session.user._id = token._id;
         session.user.isVerified = token.isVerified;
         session.user.email = token.email;
-        session.user.username = token.username || ""; // TODO: Ensures `username` exists, even if it's not provided
+        session.user.username = token.username || ""; // Use username or fallback to empty string
       }
       return session;
+    },
+    async signIn({ account, profile }) {
+      if (account.provider === "google") {
+        if (!profile?.email) {
+          throw new Error("No email available from Google profile");
+        }
+
+        await dbConnect();
+        try {
+          // Upsert (Create if not exists, otherwise update)
+          await UserModel.findOneAndUpdate(
+            { email: profile.email },
+            {
+              $set: {
+                email: profile.email,
+                username: profile.name,
+                isVerified: true, // Add email verification status if available
+              },
+            },
+            { upsert: true, new: true }
+          );
+        } catch (error) {
+          throw new Error("Failed to upsert user");
+        }
+      }
+      return true; // Allow sign-in for other providers as well
+    },
+    async redirect({ url, baseUrl }) {
+      // Redirect to the home page after successful sign-in
+      return baseUrl;
     },
   },
   pages: {

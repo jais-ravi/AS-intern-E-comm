@@ -20,8 +20,10 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { signUpSchema } from "@/schemas/signupSchema";
 import { Card } from "@/components/ui/card";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
 
-export default function Page(req) {
+export default function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -159,6 +161,24 @@ export default function Page(req) {
                   </Button>
                 </form>
               </Form>
+              <div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => signIn("google")} variant="outline">
+                <div className="flex justify-center items-center gap-4">
+                  <FcGoogle size={25} />
+                  <p>Sign up with Google</p>
+                </div>
+              </Button>
               <div className="mt-4 text-center text-sm">
                 Already have an account?{" "}
                 <Link href="/sign-in" className="underline">
