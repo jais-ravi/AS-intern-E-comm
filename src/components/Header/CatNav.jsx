@@ -82,7 +82,7 @@ const CatNav = () => {
 
   return (
     <div>
-      <div className="bg-white flex justify-center items-center border-b-2 border-black p-3 gap-3">
+      <div className="bg-white flex justify-center items-center border-b-2 border-slate-400 gap-3">
         {CatData.map((category) => (
           <NavigationMenu key={category.name}>
             <NavigationMenuList>

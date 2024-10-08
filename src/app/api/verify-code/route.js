@@ -21,7 +21,7 @@ export async function POST(request) {
     // Check if the code is correct and not expired
     const isCodeValid = user.verifyCode === code;
     // Uncomment and use the expiry check if needed
-    // const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
+    const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
 
     if (isCodeValid) {
       // Update the user's verification status
@@ -35,15 +35,15 @@ export async function POST(request) {
       );
 
       // Uncomment if you want to handle code expiry
-      // } else if (!isCodeNotExpired) {
-      //   // Code has expired
-      //   return Response.json(
-      //     {
-      //       success: false,
-      //       message: "Verification code has expired. Please request a new code.",
-      //     },
-      //     { status: 400 }
-      //   );
+      } else if (!isCodeNotExpired) {
+        // Code has expired
+        return Response.json(
+          {
+            success: false,
+            message: "Verification code has expired. Please request a new code.",
+          },
+          { status: 400 }
+        );
     } else {
       // Code is incorrect
       return Response.json(

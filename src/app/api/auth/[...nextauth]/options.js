@@ -58,7 +58,7 @@ export const authOptions = {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.email = user.email;
-        token.username = user.username || profile?.name; // Set username from profile if user.username is undefined
+        token.username = user.username || profile?.name; 
       }
       return token;
     },
@@ -87,7 +87,8 @@ export const authOptions = {
               $set: {
                 email: profile.email,
                 username: profile.name,
-                isVerified: true, // Add email verification status if available
+                isVerified: true, 
+                verifyCode:"",
               },
             },
             { upsert: true, new: true }

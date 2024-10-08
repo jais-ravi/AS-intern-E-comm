@@ -3,17 +3,14 @@ import React from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { CgProfile } from "react-icons/cg";
-import { TbTruckDelivery } from "react-icons/tb";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import { User } from "next-auth";
+import { useSession } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Profilebtn from "../Profile/Profilebtn";
-import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useToast } from "../ui/use-toast";
 
@@ -45,8 +42,8 @@ const Navbar = () => {
     },
   ];
   return (
-    <div className=" bg-white flex justify-center items-center border-b-2 border-black">
-      <div className=" min-w-[80%] flex justify-between items-center py-3 px-5 ">
+    <div className=" bg-white flex justify-center items-center border-b-2 border-slate-400">
+      <div className=" container flex justify-between items-center py-3  ">
         <div className="">
           <h1>Logo</h1>
         </div>

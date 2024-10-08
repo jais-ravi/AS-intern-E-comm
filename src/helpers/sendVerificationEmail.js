@@ -7,7 +7,7 @@ export default async function sendVerificationEmail(email, username, verifyCode)
     <VerificationEmail username={username} otp={verifyCode} />
   );
   const mailOptions = {
-    from: process.env.SMTP_USER,
+    from: `"${process.env.SMTP_USERNAME}" <${process.env.SMTP_USER}>`,
     to: email,
     subject: "Email Verification Code",
     text: "Verification mail", 

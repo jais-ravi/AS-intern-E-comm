@@ -6,9 +6,10 @@ import Navbar from '@/components/Header/Navbar'
 
 const page = () => {
   return (
-    <div className='w-full h-[100vh] bg-zinc-100'>
+    <div className=' min-h-screen w-full bg-slate-400'>
     <Navbar/>
-    <CatNav/>
+    {/* <CatNav/> */}
+    <Footer/>
     </div>
   )
 }
